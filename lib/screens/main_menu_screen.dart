@@ -26,6 +26,7 @@ class MainMenuScreen extends StatelessWidget {
                 // Title
                 const Text(
                   'Funny Dartboard',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 56,
                     fontWeight: FontWeight.bold,
