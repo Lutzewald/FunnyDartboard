@@ -139,11 +139,29 @@ class MainMenuScreen extends StatelessWidget {
                         final url = Uri.parse(
                           'https://www.paypal.me/lutzewald',
                         );
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(
-                            url,
-                            mode: LaunchMode.externalApplication,
-                          );
+                        try {
+                          final canLaunch = await canLaunchUrl(url);
+                          if (canLaunch) {
+                            await launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          } else {
+                            // Fallback: try platform default mode
+                            await launchUrl(url);
+                          }
+                        } catch (e) {
+                          // If all else fails, show a message
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Link konnte nicht geöffnet werden',
+                                ),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
                         }
                       },
                       icon: const Icon(Icons.favorite, size: 20),

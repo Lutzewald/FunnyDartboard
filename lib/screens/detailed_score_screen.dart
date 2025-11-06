@@ -53,6 +53,7 @@ class DetailedScoreScreen extends StatelessWidget {
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                               color: Colors.brown.shade300,
+                              decoration: TextDecoration.none,
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -84,6 +85,7 @@ class DetailedScoreScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.none,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -127,11 +129,17 @@ class DetailedScoreScreen extends StatelessWidget {
         backgroundColor: Colors.grey.shade900,
         title: const Text(
           'Spiel beenden?',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            decoration: TextDecoration.none,
+          ),
         ),
         content: const Text(
           'Möchten Sie wirklich das Spiel beenden und zum Hauptmenü zurückkehren? Der aktuelle Spielstand geht verloren.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: Colors.white70,
+            decoration: TextDecoration.none,
+          ),
         ),
         actions: [
           TextButton(
@@ -182,18 +190,18 @@ class DetailedScoreScreen extends StatelessWidget {
                     color: game.getCurrentPlayer().playerNumber == i
                         ? Colors.yellow.shade600
                         : Colors.white,
+                    decoration: TextDecoration.none,
                   ),
                 ),
                 Text(
                   '${game.getPlayer(i).getScore()}',
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: game.getCurrentPlayer().playerNumber == i
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
                     color: game.getCurrentPlayer().playerNumber == i
                         ? Colors.yellow.shade600
                         : Colors.white,
+                    decoration: TextDecoration.none,
                   ),
                 ),
               ],
@@ -224,12 +232,17 @@ class DetailedScoreScreen extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  decoration: TextDecoration.none,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 'Aktuelles Ziel: ${shanghaiGame.getTargetNumber()}',
-                style: TextStyle(fontSize: 16, color: Colors.orange.shade200),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.orange.shade200,
+                  decoration: TextDecoration.none,
+                ),
               ),
             ],
           ),
@@ -252,18 +265,18 @@ class DetailedScoreScreen extends StatelessWidget {
                     color: game.getCurrentPlayer().playerNumber == i
                         ? Colors.yellow.shade600
                         : Colors.white,
+                    decoration: TextDecoration.none,
                   ),
                 ),
                 Text(
                   '${game.getPlayer(i).getScore()}',
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: game.getCurrentPlayer().playerNumber == i
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
                     color: game.getCurrentPlayer().playerNumber == i
                         ? Colors.yellow.shade600
                         : Colors.white,
+                    decoration: TextDecoration.none,
                   ),
                 ),
               ],
@@ -293,6 +306,7 @@ class DetailedScoreScreen extends StatelessWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                        decoration: TextDecoration.none,
                       ),
                     ),
                   ),
@@ -316,7 +330,7 @@ class DetailedScoreScreen extends StatelessWidget {
                         Text(
                           game.getPlayer(i).name,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight:
                                 game.getCurrentPlayer().playerNumber == i
                                 ? FontWeight.bold
@@ -324,13 +338,18 @@ class DetailedScoreScreen extends StatelessWidget {
                             color: game.getCurrentPlayer().playerNumber == i
                                 ? Colors.yellow.shade600
                                 : Colors.white,
+                            decoration: TextDecoration.none,
                           ),
                         ),
                         Text(
                           '${game.getPlayer(i).getScore()}',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade400,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: game.getCurrentPlayer().playerNumber == i
+                                ? Colors.yellow.shade600
+                                : Colors.white,
+                            decoration: TextDecoration.none,
                           ),
                         ),
                       ],
