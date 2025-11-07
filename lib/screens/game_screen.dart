@@ -5,6 +5,7 @@ import '../utils/dartboard_calculator.dart';
 import '../widgets/dartboard_painter.dart';
 import '../models/player.dart';
 import '../game/shanghai.dart';
+import '../l10n/app_localizations.dart';
 import 'game_over_screen.dart';
 import 'main_menu_screen.dart';
 import 'detailed_score_screen.dart';
@@ -98,15 +99,16 @@ class _GameScreenState extends State<GameScreen>
     });
   }
 
-  String _getNextPlayerLabel(GameProvider gameProvider) {
+  String _getNextPlayerLabel(BuildContext context, GameProvider gameProvider) {
     final game = gameProvider.currentGame;
-    if (game == null) return 'Weiter';
+    final l10n = AppLocalizations.of(context)!;
+    if (game == null) return l10n.continue_;
 
     final numPlayers = game.getNumberOfPlayers();
     
     // Single player: show "Weiter"
     if (numPlayers == 1) {
-      return 'Weiter';
+      return l10n.continue_;
     }
 
     // Multiple players: show next player's name
@@ -309,9 +311,9 @@ class _GameScreenState extends State<GameScreen>
           ),
           child: Column(
             children: [
-              const Text(
-                'Ziel',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.target,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -328,7 +330,7 @@ class _GameScreenState extends State<GameScreen>
               ),
               const SizedBox(height: 4),
               Text(
-                'Runde $currentRound/$totalRounds',
+                '${AppLocalizations.of(context)!.round} $currentRound/$totalRounds',
                 style: TextStyle(color: Colors.orange.shade200, fontSize: 12),
               ),
             ],
@@ -776,6 +778,8 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Widget _buildControls(GameProvider gameProvider) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -784,7 +788,7 @@ class _GameScreenState extends State<GameScreen>
           // Zoom out button (if zoomed)
           if (_isZoomed)
             _ControlButton(
-              label: 'Zurück',
+              label: l10n.back,
               icon: Icons.zoom_out,
               onPressed: _handleZoomOut,
             ),
@@ -792,7 +796,7 @@ class _GameScreenState extends State<GameScreen>
           // Undo button
           if (!_isZoomed && gameProvider.canUndo)
             _ControlButton(
-              label: 'Rückgängig',
+              label: l10n.undo,
               icon: Icons.undo,
               onPressed: () => gameProvider.undoLastThrow(),
             ),
@@ -800,7 +804,7 @@ class _GameScreenState extends State<GameScreen>
           // Next player button
           if (!_isZoomed)
             _ControlButton(
-              label: _getNextPlayerLabel(gameProvider),
+              label: _getNextPlayerLabel(context, gameProvider),
               icon: Icons.arrow_forward,
               onPressed: () => gameProvider.nextPlayer(),
             ),
@@ -852,15 +856,17 @@ class _GameScreenState extends State<GameScreen>
   }
 
   Future<bool?> _showExitDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Spiel beenden?'),
-        content: const Text('Möchten Sie wirklich zum Hauptmenü zurückkehren?'),
+        title: Text(l10n.quitGameQuestion),
+        content: Text(l10n.exitDialogMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Abbrechen'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -871,7 +877,7 @@ class _GameScreenState extends State<GameScreen>
                 (route) => false,
               );
             },
-            child: const Text('Beenden'),
+            child: Text(l10n.quit),
           ),
         ],
       ),

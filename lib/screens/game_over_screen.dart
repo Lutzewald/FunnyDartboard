@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/game_provider.dart';
+import '../l10n/app_localizations.dart';
 import 'main_menu_screen.dart';
 
 class GameOverScreen extends StatelessWidget {
@@ -38,9 +39,9 @@ class GameOverScreen extends StatelessWidget {
                       const SizedBox(height: 40),
 
                       // Winner text
-                      const Text(
-                        'Gewinner!',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.winner,
+                        style: const TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -84,9 +85,9 @@ class GameOverScreen extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            const Text(
-                              'Endstand',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.finalScore,
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white70,
@@ -205,9 +206,9 @@ class GameOverScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'Hauptmenü',
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.mainMenu,
+                            style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.none,

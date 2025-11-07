@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/game_provider.dart';
+import '../l10n/app_localizations.dart';
 import 'game_screen.dart';
 
 class CountdownOptionsScreen extends StatelessWidget {
@@ -15,7 +16,8 @@ class CountdownOptionsScreen extends StatelessWidget {
         title: Consumer<GameProvider>(
           builder: (context, gameProvider, child) {
             final gameMode = gameProvider.selectedGameMode == 0 ? '301' : '501';
-            return Text('$gameMode Spielregeln');
+            final l10n = AppLocalizations.of(context)!;
+            return Text('$gameMode ${l10n.gameRules}');
           },
         ),
         leading: IconButton(
@@ -39,43 +41,53 @@ class CountdownOptionsScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     // IN Rules Section
-                    Column(
-                      children: [
-                        _buildSectionTitle('Einstieg'),
-                        const SizedBox(height: 16),
-                        _buildRuleGrid(
-                          rules: [
-                            ('Straight', 'straight'),
-                            ('Double', 'double'),
-                            ('Triple', 'triple'),
-                            ('Master', 'master'),
+                    Builder(
+                      builder: (context) {
+                        final l10n = AppLocalizations.of(context)!;
+                        return Column(
+                          children: [
+                            _buildSectionTitle(l10n.entry),
+                            const SizedBox(height: 16),
+                            _buildRuleGrid(
+                              rules: [
+                                (l10n.straight, 'straight'),
+                                (l10n.double, 'double'),
+                                (l10n.triple, 'triple'),
+                                (l10n.master, 'master'),
+                              ],
+                              selectedValue: gameProvider.countdownInRule,
+                              onSelected: (value) =>
+                                  gameProvider.setCountdownInRule(value),
+                            ),
                           ],
-                          selectedValue: gameProvider.countdownInRule,
-                          onSelected: (value) =>
-                              gameProvider.setCountdownInRule(value),
-                        ),
-                      ],
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 40),
 
                     // OUT Rules Section
-                    Column(
-                      children: [
-                        _buildSectionTitle('Ausstieg'),
-                        const SizedBox(height: 16),
-                        _buildRuleGrid(
-                          rules: [
-                            ('Straight', 'straight'),
-                            ('Double', 'double'),
-                            ('Triple', 'triple'),
-                            ('Master', 'master'),
+                    Builder(
+                      builder: (context) {
+                        final l10n = AppLocalizations.of(context)!;
+                        return Column(
+                          children: [
+                            _buildSectionTitle(l10n.exit),
+                            const SizedBox(height: 16),
+                            _buildRuleGrid(
+                              rules: [
+                                (l10n.straight, 'straight'),
+                                (l10n.double, 'double'),
+                                (l10n.triple, 'triple'),
+                                (l10n.master, 'master'),
+                              ],
+                              selectedValue: gameProvider.countdownOutRule,
+                              onSelected: (value) =>
+                                  gameProvider.setCountdownOutRule(value),
+                            ),
                           ],
-                          selectedValue: gameProvider.countdownOutRule,
-                          onSelected: (value) =>
-                              gameProvider.setCountdownOutRule(value),
-                        ),
-                      ],
+                        );
+                      },
                     ),
 
                     const Spacer(),
@@ -102,9 +114,9 @@ class CountdownOptionsScreen extends StatelessWidget {
                           ),
                           elevation: 8,
                         ),
-                        child: const Text(
-                          'Spiel starten',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.startGame,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),

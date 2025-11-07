@@ -96,6 +96,9 @@ class AppLocalizations {
   String get no => translate('no');
   String get ok => translate('ok');
   String get close => translate('close');
+  String get edit => translate('edit');
+  String get finalScore => translate('finalScore');
+  String get exitDialogMessage => translate('exitDialogMessage');
   
   // URL errors
   String get linkCouldNotBeOpened => translate('linkCouldNotBeOpened');
@@ -170,6 +173,9 @@ const Map<String, String> _en = {
   'no': 'No',
   'ok': 'OK',
   'close': 'Close',
+  'edit': 'Edit',
+  'finalScore': 'Final Score',
+  'exitDialogMessage': 'Do you really want to return to the main menu?',
   'linkCouldNotBeOpened': 'Link could not be opened',
 };
 
@@ -224,6 +230,9 @@ const Map<String, String> _de = {
   'no': 'Nein',
   'ok': 'OK',
   'close': 'Schließen',
+  'edit': 'Bearbeiten',
+  'finalScore': 'Endstand',
+  'exitDialogMessage': 'Möchten Sie wirklich zum Hauptmenü zurückkehren?',
   'linkCouldNotBeOpened': 'Link konnte nicht geöffnet werden',
 };
 
@@ -278,6 +287,9 @@ const Map<String, String> _it = {
   'no': 'No',
   'ok': 'OK',
   'close': 'Chiudi',
+  'edit': 'Modifica',
+  'finalScore': 'Punteggio Finale',
+  'exitDialogMessage': 'Vuoi davvero tornare al menu principale?',
   'linkCouldNotBeOpened': 'Il link non può essere aperto',
 };
 
@@ -332,6 +344,9 @@ const Map<String, String> _es = {
   'no': 'No',
   'ok': 'OK',
   'close': 'Cerrar',
+  'edit': 'Editar',
+  'finalScore': 'Puntuación Final',
+  'exitDialogMessage': '¿Realmente quieres volver al menú principal?',
   'linkCouldNotBeOpened': 'No se pudo abrir el enlace',
 };
 
@@ -386,6 +401,9 @@ const Map<String, String> _fr = {
   'no': 'Non',
   'ok': 'OK',
   'close': 'Fermer',
+  'edit': 'Modifier',
+  'finalScore': 'Score Final',
+  'exitDialogMessage': 'Voulez-vous vraiment retourner au menu principal?',
   'linkCouldNotBeOpened': 'Le lien n\'a pas pu être ouvert',
 };
 
@@ -440,6 +458,9 @@ const Map<String, String> _ga = {
   'no': 'Níl',
   'ok': 'Ceart go Leor',
   'close': 'Dún',
+  'edit': 'Cuir in Eagar',
+  'finalScore': 'Scór Deiridh',
+  'exitDialogMessage': 'Ar mhaith leat dul ar ais go dtí an príomhroghchlár?',
   'linkCouldNotBeOpened': 'Níorbh fhéidir an nasc a oscailt',
 };
 

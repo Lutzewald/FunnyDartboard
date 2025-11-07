@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../game/dart_game.dart';
 import '../game/shanghai.dart';
 import '../utils/game_provider.dart';
+import '../l10n/app_localizations.dart';
 import 'main_menu_screen.dart';
 
 class DetailedScoreScreen extends StatelessWidget {
@@ -47,7 +48,7 @@ class DetailedScoreScreen extends StatelessWidget {
                         children: [
                           // Title
                           Text(
-                            'Spielstand',
+                            AppLocalizations.of(context)!.score,
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -61,7 +62,7 @@ class DetailedScoreScreen extends StatelessWidget {
                           if (gameMode == 2)
                             _buildCricketGrid()
                           else if (gameMode == 3)
-                            _buildShanghaiInfo()
+                            _buildShanghaiInfo(context)
                           else
                             _buildSimpleScores(),
                         ],
@@ -79,9 +80,9 @@ class DetailedScoreScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => _showQuitConfirmation(context),
                       icon: const Icon(Icons.exit_to_app),
-                      label: const Text(
-                        'Spiel beenden',
-                        style: TextStyle(
+                      label: Text(
+                        AppLocalizations.of(context)!.quitGame,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.none,
@@ -122,20 +123,22 @@ class DetailedScoreScreen extends StatelessWidget {
   }
 
   Future<void> _showQuitConfirmation(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    
     final shouldQuit = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
-        title: const Text(
-          'Spiel beenden?',
-          style: TextStyle(
+        title: Text(
+          l10n.quitGameQuestion,
+          style: const TextStyle(
             color: Colors.white,
             decoration: TextDecoration.none,
           ),
         ),
-        content: const Text(
-          'Möchten Sie wirklich das Spiel beenden und zum Hauptmenü zurückkehren? Der aktuelle Spielstand geht verloren.',
-          style: TextStyle(
+        content: Text(
+          l10n.quitGameWarning,
+          style: const TextStyle(
             color: Colors.white70,
             decoration: TextDecoration.none,
           ),
@@ -144,14 +147,14 @@ class DetailedScoreScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Abbrechen',
+              l10n.cancel,
               style: TextStyle(color: Colors.grey.shade400),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Beenden'),
+            child: Text(l10n.quit),
           ),
         ],
       ),
@@ -210,9 +213,10 @@ class DetailedScoreScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShanghaiInfo() {
+  Widget _buildShanghaiInfo(BuildContext context) {
     final numPlayers = game.getNumberOfPlayers();
     final shanghaiGame = game as Shanghai;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       children: [
@@ -226,7 +230,7 @@ class DetailedScoreScreen extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                'Runde ${shanghaiGame.getCurrentRound()}/${shanghaiGame.getTotalRounds()}',
+                '${l10n.round} ${shanghaiGame.getCurrentRound()}/${shanghaiGame.getTotalRounds()}',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -236,7 +240,7 @@ class DetailedScoreScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Aktuelles Ziel: ${shanghaiGame.getTargetNumber()}',
+                '${l10n.currentTarget}: ${shanghaiGame.getTargetNumber()}',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.orange.shade200,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/game_provider.dart';
+import '../l10n/app_localizations.dart';
 import 'game_screen.dart';
 import 'countdown_options_screen.dart';
 
@@ -34,7 +35,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                         children: [
                           // Active players section
                           Text(
-                            'Aktive Spieler',
+                            AppLocalizations.of(context)!.activePlayers,
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -116,7 +117,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                               gameProvider.numberOfActivePlayers) ...[
                             const SizedBox(height: 24),
                             Text(
-                              'Pause',
+                              AppLocalizations.of(context)!.pause,
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -215,9 +216,9 @@ class PlayerSelectionScreen extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () => gameProvider.addPlayer(),
                         icon: const Icon(Icons.person_add, size: 28),
-                        label: const Text(
-                          'Spieler hinzufügen',
-                          style: TextStyle(
+                        label: Text(
+                          AppLocalizations.of(context)!.addPlayer,
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
@@ -277,9 +278,9 @@ class PlayerSelectionScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        child: const Text(
-                          'Start',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.start,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -305,20 +306,19 @@ class PlayerSelectionScreen extends StatelessWidget {
       text: gameProvider.playerNames[index],
     );
 
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
-        title: const Text(
-          'Namen bearbeiten',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text(l10n.editName, style: const TextStyle(color: Colors.white)),
         content: TextField(
           controller: controller,
           autofocus: true,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            hintText: 'Name eingeben',
+            hintText: l10n.enterName,
             hintStyle: TextStyle(color: Colors.grey.shade500),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.brown.shade400),
@@ -338,7 +338,7 @@ class PlayerSelectionScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Abbrechen',
+              l10n.cancel,
               style: TextStyle(color: Colors.grey.shade400),
             ),
           ),
@@ -350,7 +350,7 @@ class PlayerSelectionScreen extends StatelessWidget {
               Navigator.pop(context);
             },
             child: Text(
-              'Speichern',
+              l10n.save,
               style: TextStyle(color: Colors.brown.shade300),
             ),
           ),
@@ -440,13 +440,15 @@ class _PlayerListItem extends StatelessWidget {
                       ],
                       if (!isPaused) ...[
                         const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: onEdit,
-                          icon: const Icon(Icons.edit, size: 20),
-                          color: Colors.brown.shade300,
-                          tooltip: 'Bearbeiten',
-                          padding: const EdgeInsets.all(4),
-                          constraints: const BoxConstraints(),
+                        Builder(
+                          builder: (context) => IconButton(
+                            onPressed: onEdit,
+                            icon: const Icon(Icons.edit, size: 20),
+                            color: Colors.brown.shade300,
+                            tooltip: AppLocalizations.of(context)!.edit,
+                            padding: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints(),
+                          ),
                         ),
                       ],
                     ],
@@ -460,78 +462,93 @@ class _PlayerListItem extends StatelessWidget {
                       runSpacing: 0,
                       children: [
                         // Beer
-                        IconButton(
-                          onPressed: () => onTogglePause('beer'),
-                          icon: Icon(
-                            Icons.sports_bar,
-                            color: Colors.orange.shade600,
-                            size: 18,
-                          ),
-                          tooltip: '🍺 Bier',
-                          padding: const EdgeInsets.all(2),
-                          constraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
+                        Builder(
+                          builder: (context) => IconButton(
+                            onPressed: () => onTogglePause('beer'),
+                            icon: Icon(
+                              Icons.sports_bar,
+                              color: Colors.orange.shade600,
+                              size: 18,
+                            ),
+                            tooltip: AppLocalizations.of(context)!.pauseBeer,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            visualDensity: VisualDensity.compact,
                           ),
                         ),
                         // Toilet
-                        IconButton(
-                          onPressed: () => onTogglePause('toilet'),
-                          icon: Icon(
-                            Icons.wc,
-                            color: Colors.blue.shade400,
-                            size: 18,
-                          ),
-                          tooltip: '🚽 WC',
-                          padding: const EdgeInsets.all(2),
-                          constraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
+                        Builder(
+                          builder: (context) => IconButton(
+                            onPressed: () => onTogglePause('toilet'),
+                            icon: Icon(
+                              Icons.wc,
+                              color: Colors.blue.shade400,
+                              size: 18,
+                            ),
+                            tooltip: AppLocalizations.of(context)!.pauseToilet,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            visualDensity: VisualDensity.compact,
                           ),
                         ),
                         // Cigarette
-                        IconButton(
-                          onPressed: () => onTogglePause('smoke'),
-                          icon: Icon(
-                            Icons.smoking_rooms,
-                            color: Colors.grey.shade500,
-                            size: 18,
-                          ),
-                          tooltip: '🚬 Rauchen',
-                          padding: const EdgeInsets.all(2),
-                          constraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
+                        Builder(
+                          builder: (context) => IconButton(
+                            onPressed: () => onTogglePause('smoke'),
+                            icon: Icon(
+                              Icons.smoking_rooms,
+                              color: Colors.grey.shade500,
+                              size: 18,
+                            ),
+                            tooltip: AppLocalizations.of(context)!.pauseSmoke,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            visualDensity: VisualDensity.compact,
                           ),
                         ),
                         // Puking/sick
-                        IconButton(
-                          onPressed: () => onTogglePause('sick'),
-                          icon: Icon(
-                            Icons.sick,
-                            color: Colors.green.shade300,
-                            size: 18,
-                          ),
-                          tooltip: '🤮 Kotzen',
-                          padding: const EdgeInsets.all(2),
-                          constraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
+                        Builder(
+                          builder: (context) => IconButton(
+                            onPressed: () => onTogglePause('sick'),
+                            icon: Icon(
+                              Icons.sick,
+                              color: Colors.green.shade300,
+                              size: 18,
+                            ),
+                            tooltip: AppLocalizations.of(context)!.pauseSick,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            visualDensity: VisualDensity.compact,
                           ),
                         ),
                         // Love/sex
-                        IconButton(
-                          onPressed: () => onTogglePause('love'),
-                          icon: Icon(
-                            Icons.favorite,
-                            color: Colors.pink.shade300,
-                            size: 18,
-                          ),
-                          tooltip: '❤️ Liebe',
-                          padding: const EdgeInsets.all(2),
-                          constraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
+                        Builder(
+                          builder: (context) => IconButton(
+                            onPressed: () => onTogglePause('love'),
+                            icon: Icon(
+                              Icons.favorite,
+                              color: Colors.pink.shade300,
+                              size: 18,
+                            ),
+                            tooltip: AppLocalizations.of(context)!.pauseLove,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            visualDensity: VisualDensity.compact,
                           ),
                         ),
                       ],
@@ -543,18 +560,22 @@ class _PlayerListItem extends StatelessWidget {
 
             // Right button - delete for active players, return for paused players
             if (!isPaused)
-              IconButton(
-                onPressed: onRemove,
-                icon: const Icon(Icons.delete),
-                color: Colors.red.shade400,
-                tooltip: 'Entfernen',
+              Builder(
+                builder: (context) => IconButton(
+                  onPressed: onRemove,
+                  icon: const Icon(Icons.delete),
+                  color: Colors.red.shade400,
+                  tooltip: AppLocalizations.of(context)!.remove,
+                ),
               )
             else
-              IconButton(
-                onPressed: () => onTogglePause(''),
-                icon: const Icon(Icons.near_me),
-                color: Colors.green.shade400,
-                tooltip: 'Zurück zum Spiel',
+              Builder(
+                builder: (context) => IconButton(
+                  onPressed: () => onTogglePause(''),
+                  icon: const Icon(Icons.near_me),
+                  color: Colors.green.shade400,
+                  tooltip: AppLocalizations.of(context)!.backToGame,
+                ),
               ),
           ],
         ),
