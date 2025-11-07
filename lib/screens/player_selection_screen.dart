@@ -92,8 +92,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                                   final index = activeIndices[listIndex];
                                   return _PlayerListItem(
                                     key: ValueKey('player_$index'),
-                                    playerName:
-                                        gameProvider.playerNames[index],
+                                    playerName: gameProvider.playerNames[index],
                                     displayNumber: listIndex + 1,
                                     isPaused: false,
                                     dragIndex: listIndex,
@@ -102,7 +101,8 @@ class PlayerSelectionScreen extends StatelessWidget {
                                       gameProvider,
                                       index,
                                     ),
-                                    onRemove: () => gameProvider.removePlayer(index),
+                                    onRemove: () =>
+                                        gameProvider.removePlayer(index),
                                     onTogglePause: (reason) => gameProvider
                                         .togglePlayerPause(index, reason),
                                   );
@@ -151,7 +151,9 @@ class PlayerSelectionScreen extends StatelessWidget {
                                         return Material(
                                           elevation: 8,
                                           color: Colors.transparent,
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           child: child,
                                         );
                                       },
@@ -182,14 +184,15 @@ class PlayerSelectionScreen extends StatelessWidget {
                                           null, // No number for paused players
                                       isPaused: true,
                                       dragIndex: listIndex,
-                                      pauseReason: gameProvider
-                                          .playerPauseReason[index],
+                                      pauseReason:
+                                          gameProvider.playerPauseReason[index],
                                       onEdit: () => _showEditDialog(
                                         context,
                                         gameProvider,
                                         index,
                                       ),
-                                      onRemove: () => gameProvider.removePlayer(index),
+                                      onRemove: () =>
+                                          gameProvider.removePlayer(index),
                                       onTogglePause: (reason) => gameProvider
                                           .togglePlayerPause(index, reason),
                                     );
@@ -405,12 +408,16 @@ class _PlayerListItem extends StatelessWidget {
                 index: dragIndex,
                 child: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Icon(Icons.drag_handle, color: Colors.grey.shade600, size: 24),
+                  child: Icon(
+                    Icons.drag_handle,
+                    color: Colors.grey.shade600,
+                    size: 24,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
             ],
-            
+
             // Main content - name, edit button, and pause buttons below
             Expanded(
               child: Column(
@@ -444,12 +451,12 @@ class _PlayerListItem extends StatelessWidget {
                       ],
                     ],
                   ),
-                  
+
                   // Second row: pause buttons (only for active players)
                   if (!isPaused) ...[
                     const SizedBox(height: 8),
                     Wrap(
-                      spacing: 8,
+                      spacing: 2,
                       children: [
                         // Beer
                         IconButton(
@@ -457,10 +464,14 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.sports_bar,
                             color: Colors.orange.shade600,
-                            size: 24,
+                            size: 20,
                           ),
                           tooltip: '🍺 Bier',
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                         ),
                         // Toilet
                         IconButton(
@@ -468,10 +479,14 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.wc,
                             color: Colors.blue.shade400,
-                            size: 24,
+                            size: 20,
                           ),
                           tooltip: '🚽 WC',
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                         ),
                         // Cigarette
                         IconButton(
@@ -479,10 +494,14 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.smoking_rooms,
                             color: Colors.grey.shade500,
-                            size: 24,
+                            size: 20,
                           ),
                           tooltip: '🚬 Rauchen',
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                         ),
                         // Puking/sick
                         IconButton(
@@ -490,10 +509,14 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.sick,
                             color: Colors.green.shade300,
-                            size: 24,
+                            size: 20,
                           ),
                           tooltip: '🤮 Kotzen',
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                         ),
                         // Love/sex
                         IconButton(
@@ -501,10 +524,14 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.favorite,
                             color: Colors.pink.shade300,
-                            size: 24,
+                            size: 20,
                           ),
                           tooltip: '❤️ Liebe',
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                         ),
                       ],
                     ),
@@ -512,7 +539,7 @@ class _PlayerListItem extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Right button - delete for active players, return for paused players
             if (!isPaused)
               IconButton(
