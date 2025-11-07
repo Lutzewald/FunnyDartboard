@@ -62,14 +62,19 @@ class _GameScreenState extends State<GameScreen>
       double offsetX = (centerX - tapPosition.dx) * (zoomFactor - 1);
       double offsetY = (centerY - tapPosition.dy) * (zoomFactor - 1);
 
-      // Add margin shift based on which side was tapped
-      if (tapPosition.dx < centerX) {
-        // Tapped on left half - shift view to the right
+      // Calculate horizontal thirds
+      final leftThirdBoundary = boardSize.width / 3;
+      final rightThirdBoundary = boardSize.width * 2 / 3;
+
+      // Add margin shift based on which horizontal third was tapped
+      if (tapPosition.dx < leftThirdBoundary) {
+        // Tapped on left third - shift view to the right
         offsetX += edgeMargin;
-      } else {
-        // Tapped on right half - shift view to the left
+      } else if (tapPosition.dx > rightThirdBoundary) {
+        // Tapped on right third - shift view to the left
         offsetX -= edgeMargin;
       }
+      // Center third: no horizontal shift
       
       if (tapPosition.dy < centerY) {
         // Tapped on top half - shift view down

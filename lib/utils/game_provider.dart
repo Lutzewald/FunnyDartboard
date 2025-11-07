@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../game/dart_game.dart';
 import '../game/countdown.dart';
 import '../game/cricket.dart';
@@ -18,13 +19,16 @@ class GameProvider extends ChangeNotifier {
   String _countdownOutRule = 'double'; // straight, double, triple, master
 
   GameProvider() {
-    // Initialize with 2 random players
+    // Initialize with 2 random players (will be replaced if loaded from storage)
     _playerNames = [
       NameGenerator.getRandomName(),
       NameGenerator.getUniqueName([]),
     ];
     _playerPaused = [false, false]; // Both active by default
     _playerPauseReason = ['', '']; // Empty initially
+
+    // Load players from storage
+    _loadPlayers();
   }
 
   DartGame? get currentGame => _currentGame;
@@ -54,12 +58,14 @@ class GameProvider extends ChangeNotifier {
   void setCountdownInRule(String rule) {
     _countdownInRule = rule;
     notifyListeners();
+    savePlayers(); // Auto-save
   }
 
   /// Set countdown out rule
   void setCountdownOutRule(String rule) {
     _countdownOutRule = rule;
     notifyListeners();
+    savePlayers(); // Auto-save
   }
 
   /// Add a new player with a random name
@@ -69,6 +75,7 @@ class GameProvider extends ChangeNotifier {
     _playerPaused.add(false); // New player is active by default
     _playerPauseReason.add(''); // No reason initially
     notifyListeners();
+    savePlayers(); // Auto-save
   }
 
   /// Remove a player at index
@@ -78,6 +85,7 @@ class GameProvider extends ChangeNotifier {
       _playerPaused.removeAt(index);
       _playerPauseReason.removeAt(index);
       notifyListeners();
+      savePlayers(); // Auto-save
     }
   }
 
@@ -86,6 +94,7 @@ class GameProvider extends ChangeNotifier {
     if (index >= 0 && index < _playerNames.length && newName.isNotEmpty) {
       _playerNames[index] = newName;
       notifyListeners();
+      savePlayers(); // Auto-save
     }
   }
 
@@ -103,6 +112,7 @@ class GameProvider extends ChangeNotifier {
     _playerPauseReason.insert(newIndex, reason);
 
     notifyListeners();
+    savePlayers(); // Auto-save
   }
 
   /// Toggle player pause status with reason
@@ -114,6 +124,7 @@ class GameProvider extends ChangeNotifier {
         _playerPaused[index] = !_playerPaused[index];
         _playerPauseReason[index] = _playerPaused[index] ? reason : '';
         notifyListeners();
+        savePlayers(); // Auto-save
       }
     }
   }
@@ -188,5 +199,95 @@ class GameProvider extends ChangeNotifier {
   /// Get hits on a field for a player
   int getHits(int fieldValue, Player player) {
     return _currentGame?.getHits(fieldValue, player) ?? 0;
+  }
+
+  /// Save players to local storage
+  Future<void> savePlayers() async {
+    try {
+      if (kDebugMode) {
+        print('Saving players: $_playerNames');
+      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('player_names', _playerNames);
+      await prefs.setStringList(
+        'player_paused',
+        _playerPaused.map((p) => p.toString()).toList(),
+      );
+      await prefs.setStringList('player_pause_reason', _playerPauseReason);
+      await prefs.setString('countdown_in_rule', _countdownInRule);
+      await prefs.setString('countdown_out_rule', _countdownOutRule);
+      if (kDebugMode) {
+        print('Players saved successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving players: $e');
+      }
+    }
+  }
+
+  /// Load players from local storage
+  Future<void> _loadPlayers() async {
+    try {
+      if (kDebugMode) {
+        print('Loading players from storage...');
+      }
+      final prefs = await SharedPreferences.getInstance();
+      final names = prefs.getStringList('player_names');
+
+      if (kDebugMode) {
+        print('Loaded names: $names');
+      }
+
+      if (names != null && names.isNotEmpty) {
+        _playerNames.clear();
+        _playerNames.addAll(names);
+
+        final paused = prefs.getStringList('player_paused');
+        if (paused != null && paused.length == names.length) {
+          _playerPaused.clear();
+          _playerPaused.addAll(paused.map((p) => p == 'true'));
+        } else {
+          _playerPaused.clear();
+          _playerPaused.addAll(List.filled(names.length, false));
+        }
+
+        final reasons = prefs.getStringList('player_pause_reason');
+        if (reasons != null && reasons.length == names.length) {
+          _playerPauseReason.clear();
+          _playerPauseReason.addAll(reasons);
+        } else {
+          _playerPauseReason.clear();
+          _playerPauseReason.addAll(List.filled(names.length, ''));
+        }
+
+        notifyListeners();
+      } else {
+        if (kDebugMode) {
+          print('No saved players found, using defaults');
+        }
+      }
+
+      // Load countdown rules
+      final inRule = prefs.getString('countdown_in_rule');
+      if (inRule != null) {
+        _countdownInRule = inRule;
+      }
+
+      final outRule = prefs.getString('countdown_out_rule');
+      if (outRule != null) {
+        _countdownOutRule = outRule;
+      }
+
+      if (kDebugMode) {
+        print(
+          'Loaded countdown rules - In: $_countdownInRule, Out: $_countdownOutRule',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading players: $e');
+      }
+    }
   }
 }

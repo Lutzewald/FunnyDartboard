@@ -279,7 +279,11 @@ class PlayerSelectionScreen extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          AppLocalizations.of(context)!.start,
+                          // Show "Continue" (Weiter) for countdown modes, "Start Game" (Spiel starten) for others
+                          (gameProvider.selectedGameMode == 0 ||
+                                  gameProvider.selectedGameMode == 1)
+                              ? AppLocalizations.of(context)!.continue_
+                              : AppLocalizations.of(context)!.startGame,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
