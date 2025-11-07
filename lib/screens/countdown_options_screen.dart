@@ -37,7 +37,6 @@ class CountdownOptionsScreen extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     // IN Rules Section
                     Column(
@@ -58,6 +57,8 @@ class CountdownOptionsScreen extends StatelessWidget {
                       ],
                     ),
 
+                    const SizedBox(height: 40),
+
                     // OUT Rules Section
                     Column(
                       children: [
@@ -76,6 +77,8 @@ class CountdownOptionsScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+
+                    const Spacer(),
 
                     // Start button
                     SizedBox(

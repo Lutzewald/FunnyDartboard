@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../game/dart_game.dart';
 import '../game/shanghai.dart';
-import '../widgets/chalk_tick_painter.dart';
 import '../utils/game_provider.dart';
 import 'main_menu_screen.dart';
 
@@ -374,23 +373,78 @@ class DetailedScoreScreen extends StatelessWidget {
   Widget _buildCricketCell(int fieldValue, player) {
     final hits = game.getHits(fieldValue, player);
     final isClosed = game.getField(fieldValue).isClosed();
+    final field = game.getField(fieldValue);
+    final isOpenByPlayer = field.isOpenByPlayer(player);
 
-    return Container(
-      height: 30,
-      decoration: BoxDecoration(
-        color: isClosed
-            ? Colors.red.shade900.withValues(alpha: 0.3)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Center(
-        child: hits > 0
-            ? ChalkTicks(
-                count: hits.clamp(0, 5),
-                color: isClosed ? Colors.red.shade400 : Colors.white,
-              )
-            : const SizedBox.shrink(),
-      ),
-    );
+    // If field is closed, show red badge with lock icon
+    if (isClosed) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.red.shade700,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(
+            Icons.lock,
+            color: Colors.white,
+            size: 18,
+          ),
+        ),
+      );
+    }
+
+    // If field is opened (3+ hits), show green badge with checkmark
+    if (isOpenByPlayer && hits >= 3) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.green.shade700,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(
+            Icons.check,
+            color: Colors.white,
+            size: 18,
+          ),
+        ),
+      );
+    }
+
+    // Show orange dots for 1-2 hits
+    if (hits > 0) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.orange.shade700,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.circle,
+                color: Colors.white,
+                size: 10,
+              ),
+              if (hits >= 2) ...[
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.circle,
+                  color: Colors.white,
+                  size: 10,
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 }

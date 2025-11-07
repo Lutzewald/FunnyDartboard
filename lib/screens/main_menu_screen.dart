@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/game_provider.dart';
+import '../l10n/app_localizations.dart';
 import 'player_selection_screen.dart';
 
 class MainMenuScreen extends StatelessWidget {
@@ -9,6 +10,8 @@ class MainMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -24,8 +27,8 @@ class MainMenuScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Title
-                const Text(
-                  'Funny Dartboard',
+                Text(
+                  l10n.appName,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 56,
@@ -154,20 +157,20 @@ class MainMenuScreen extends StatelessWidget {
                           // If all else fails, show a message
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
-                                  'Link konnte nicht geöffnet werden',
+                                  l10n.linkCouldNotBeOpened,
                                 ),
-                                duration: Duration(seconds: 2),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           }
                         }
                       },
                       icon: const Icon(Icons.favorite, size: 20),
-                      label: const Text(
-                        'Spende',
-                        style: TextStyle(
+                      label: Text(
+                        l10n.donation,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),

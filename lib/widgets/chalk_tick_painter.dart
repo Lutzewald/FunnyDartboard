@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 /// Draws chalk-style tick marks (like on a chalkboard)
 class ChalkTickPainter extends CustomPainter {
@@ -18,7 +17,6 @@ class ChalkTickPainter extends CustomPainter {
 
     final spacing = 8.0;
     final tickHeight = 16.0;
-    final tickAngle = 15 * pi / 180; // Slight angle for hand-drawn look
 
     for (int i = 0; i < tickCount && i < 5; i++) {
       final x = i * spacing;
@@ -28,13 +26,8 @@ class ChalkTickPainter extends CustomPainter {
         // Draw diagonal cross line through the 4 previous ticks
         canvas.drawLine(Offset(-2, tickHeight), Offset(x + 2, 0), paint);
       } else {
-        // Draw vertical tick with slight angle
-        final startY = tickHeight;
-        final endY = 0.0;
-        final startX = x + sin(tickAngle) * tickHeight;
-        final endX = x;
-
-        canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
+        // Draw perfectly vertical tick
+        canvas.drawLine(Offset(x, tickHeight), Offset(x, 0), paint);
       }
     }
   }
@@ -54,9 +47,14 @@ class ChalkTicks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(40, 20),
-      painter: ChalkTickPainter(tickCount: count, chalkColor: color),
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(left: 16),
+        child: CustomPaint(
+          size: const Size(40, 20),
+          painter: ChalkTickPainter(tickCount: count, chalkColor: color),
+        ),
+      ),
     );
   }
 }

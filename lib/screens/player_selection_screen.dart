@@ -62,7 +62,25 @@ class PlayerSelectionScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 buildDefaultDragHandles: false,
                                 itemCount: activeIndices.length,
+                                proxyDecorator: (child, index, animation) {
+                                  return AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (context, child) {
+                                      return Material(
+                                        elevation: 8,
+                                        color: Colors.transparent,
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: child,
+                                      );
+                                    },
+                                    child: child,
+                                  );
+                                },
                                 onReorder: (oldIndex, newIndex) {
+                                  // Adjust newIndex when dragging down
+                                  if (newIndex > oldIndex) {
+                                    newIndex -= 1;
+                                  }
                                   final realOldIndex = activeIndices[oldIndex];
                                   final realNewIndex = activeIndices[newIndex];
                                   gameProvider.reorderPlayers(
@@ -72,29 +90,21 @@ class PlayerSelectionScreen extends StatelessWidget {
                                 },
                                 itemBuilder: (context, listIndex) {
                                   final index = activeIndices[listIndex];
-                                  return ReorderableDragStartListener(
+                                  return _PlayerListItem(
                                     key: ValueKey('player_$index'),
-                                    index: listIndex,
-                                    child: _PlayerListItem(
-                                      playerName:
-                                          gameProvider.playerNames[index],
-                                      displayNumber: listIndex + 1,
-                                      isPaused: false,
-                                      onEdit: () => _showEditDialog(
-                                        context,
-                                        gameProvider,
-                                        index,
-                                      ),
-                                      onRemove: gameProvider.numberOfPlayers > 1
-                                          ? () => _showRemoveDialog(
-                                              context,
-                                              gameProvider,
-                                              index,
-                                            )
-                                          : null,
-                                      onTogglePause: (reason) => gameProvider
-                                          .togglePlayerPause(index, reason),
+                                    playerName:
+                                        gameProvider.playerNames[index],
+                                    displayNumber: listIndex + 1,
+                                    isPaused: false,
+                                    dragIndex: listIndex,
+                                    onEdit: () => _showEditDialog(
+                                      context,
+                                      gameProvider,
+                                      index,
                                     ),
+                                    onRemove: () => gameProvider.removePlayer(index),
+                                    onTogglePause: (reason) => gameProvider
+                                        .togglePlayerPause(index, reason),
                                   );
                                 },
                               );
@@ -134,7 +144,25 @@ class PlayerSelectionScreen extends StatelessWidget {
                                   physics: const NeverScrollableScrollPhysics(),
                                   buildDefaultDragHandles: false,
                                   itemCount: pausedIndices.length,
+                                  proxyDecorator: (child, index, animation) {
+                                    return AnimatedBuilder(
+                                      animation: animation,
+                                      builder: (context, child) {
+                                        return Material(
+                                          elevation: 8,
+                                          color: Colors.transparent,
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: child,
+                                        );
+                                      },
+                                      child: child,
+                                    );
+                                  },
                                   onReorder: (oldIndex, newIndex) {
+                                    // Adjust newIndex when dragging down
+                                    if (newIndex > oldIndex) {
+                                      newIndex -= 1;
+                                    }
                                     final realOldIndex =
                                         pausedIndices[oldIndex];
                                     final realNewIndex =
@@ -146,33 +174,24 @@ class PlayerSelectionScreen extends StatelessWidget {
                                   },
                                   itemBuilder: (context, listIndex) {
                                     final index = pausedIndices[listIndex];
-                                    return ReorderableDragStartListener(
+                                    return _PlayerListItem(
                                       key: ValueKey('player_$index'),
-                                      index: listIndex,
-                                      child: _PlayerListItem(
-                                        playerName:
-                                            gameProvider.playerNames[index],
-                                        displayNumber:
-                                            null, // No number for paused players
-                                        isPaused: true,
-                                        pauseReason: gameProvider
-                                            .playerPauseReason[index],
-                                        onEdit: () => _showEditDialog(
-                                          context,
-                                          gameProvider,
-                                          index,
-                                        ),
-                                        onRemove:
-                                            gameProvider.numberOfPlayers > 1
-                                            ? () => _showRemoveDialog(
-                                                context,
-                                                gameProvider,
-                                                index,
-                                              )
-                                            : null,
-                                        onTogglePause: (reason) => gameProvider
-                                            .togglePlayerPause(index, reason),
+                                      playerName:
+                                          gameProvider.playerNames[index],
+                                      displayNumber:
+                                          null, // No number for paused players
+                                      isPaused: true,
+                                      dragIndex: listIndex,
+                                      pauseReason: gameProvider
+                                          .playerPauseReason[index],
+                                      onEdit: () => _showEditDialog(
+                                        context,
+                                        gameProvider,
+                                        index,
                                       ),
+                                      onRemove: () => gameProvider.removePlayer(index),
+                                      onTogglePause: (reason) => gameProvider
+                                          .togglePlayerPause(index, reason),
                                     );
                                   },
                                 );
@@ -223,28 +242,30 @@ class PlayerSelectionScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // For 301/501 modes, show options screen first
-                          if (gameProvider.selectedGameMode == 0 ||
-                              gameProvider.selectedGameMode == 1) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const CountdownOptionsScreen(),
-                              ),
-                            );
-                          } else {
-                            // For Cricket and Shanghai, start game directly
-                            gameProvider.startGame();
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const GameScreen(),
-                              ),
-                            );
-                          }
-                        },
+                        onPressed: gameProvider.numberOfActivePlayers > 0
+                            ? () {
+                                // For 301/501 modes, show options screen first
+                                if (gameProvider.selectedGameMode == 0 ||
+                                    gameProvider.selectedGameMode == 1) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CountdownOptionsScreen(),
+                                    ),
+                                  );
+                                } else {
+                                  // For Cricket and Shanghai, start game directly
+                                  gameProvider.startGame();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const GameScreen(),
+                                    ),
+                                  );
+                                }
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade600,
                           foregroundColor: Colors.white,
@@ -268,44 +289,6 @@ class PlayerSelectionScreen extends StatelessWidget {
             },
           ),
         ),
-      ),
-    );
-  }
-
-  void _showRemoveDialog(
-    BuildContext context,
-    GameProvider gameProvider,
-    int index,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey.shade900,
-        title: const Text(
-          'Spieler entfernen',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          'Möchten Sie ${gameProvider.playerNames[index]} wirklich entfernen?',
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Abbrechen',
-              style: TextStyle(color: Colors.grey.shade400),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              gameProvider.removePlayer(index);
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red.shade400),
-            child: const Text('Entfernen'),
-          ),
-        ],
       ),
     );
   }
@@ -378,25 +361,28 @@ class _PlayerListItem extends StatelessWidget {
   final String playerName;
   final int? displayNumber; // Null for paused players
   final bool isPaused;
+  final int dragIndex;
   final String pauseReason;
   final VoidCallback onEdit;
-  final VoidCallback? onRemove;
+  final VoidCallback onRemove;
   final Function(String) onTogglePause;
 
   const _PlayerListItem({
+    super.key,
     required this.playerName,
     required this.displayNumber,
     required this.isPaused,
+    required this.dragIndex,
     this.pauseReason = '',
     required this.onEdit,
-    this.onRemove,
+    required this.onRemove,
     required this.onTogglePause,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isPaused
@@ -410,16 +396,28 @@ class _PlayerListItem extends StatelessWidget {
       ),
       child: Opacity(
         opacity: isPaused ? 0.6 : 1.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // First row: drag handle, name, edit button, delete button
-            Row(
-              children: [
-                Icon(Icons.drag_handle, color: Colors.grey.shade600, size: 24),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Row(
+            // Drag handle - centered vertically (only for active players)
+            if (!isPaused) ...[
+              ReorderableDragStartListener(
+                index: dragIndex,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(Icons.drag_handle, color: Colors.grey.shade600, size: 24),
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
+            
+            // Main content - name, edit button, and pause buttons below
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // First row: name and edit button
+                  Row(
                     children: [
                       Text(
                         playerName,
@@ -433,108 +431,103 @@ class _PlayerListItem extends StatelessWidget {
                         const SizedBox(width: 8),
                         _getPauseReasonIcon(pauseReason),
                       ],
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: onEdit,
-                        icon: const Icon(Icons.edit, size: 20),
-                        color: Colors.brown.shade300,
-                        tooltip: 'Bearbeiten',
-                        padding: const EdgeInsets.all(4),
-                        constraints: const BoxConstraints(),
-                      ),
+                      if (!isPaused) ...[
+                        const SizedBox(width: 8),
+                        IconButton(
+                          onPressed: onEdit,
+                          icon: const Icon(Icons.edit, size: 20),
+                          color: Colors.brown.shade300,
+                          tooltip: 'Bearbeiten',
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
                     ],
                   ),
-                ),
-                IconButton(
-                  onPressed: onRemove,
-                  icon: const Icon(Icons.delete),
-                  color: onRemove != null ? Colors.red.shade400 : Colors.grey,
-                  tooltip: 'Entfernen',
-                ),
-              ],
-            ),
-
-            // Second row: pause buttons (centered)
-            if (!isPaused) ...[
-              const SizedBox(height: 8),
-              Center(
-                child: Wrap(
-                  spacing: 8,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    // Beer
-                    IconButton(
-                      onPressed: () => onTogglePause('beer'),
-                      icon: Icon(
-                        Icons.sports_bar,
-                        color: Colors.orange.shade600,
-                        size: 24,
-                      ),
-                      tooltip: '🍺 Bier',
-                      padding: const EdgeInsets.all(8),
-                    ),
-                    // Toilet
-                    IconButton(
-                      onPressed: () => onTogglePause('toilet'),
-                      icon: Icon(
-                        Icons.wc,
-                        color: Colors.blue.shade400,
-                        size: 24,
-                      ),
-                      tooltip: '🚽 WC',
-                      padding: const EdgeInsets.all(8),
-                    ),
-                    // Cigarette
-                    IconButton(
-                      onPressed: () => onTogglePause('smoke'),
-                      icon: Icon(
-                        Icons.smoking_rooms,
-                        color: Colors.grey.shade500,
-                        size: 24,
-                      ),
-                      tooltip: '🚬 Rauchen',
-                      padding: const EdgeInsets.all(8),
-                    ),
-                    // Puking/sick
-                    IconButton(
-                      onPressed: () => onTogglePause('sick'),
-                      icon: Icon(
-                        Icons.sick,
-                        color: Colors.green.shade300,
-                        size: 24,
-                      ),
-                      tooltip: '🤮 Kotzen',
-                      padding: const EdgeInsets.all(8),
-                    ),
-                    // Love/sex
-                    IconButton(
-                      onPressed: () => onTogglePause('love'),
-                      icon: Icon(
-                        Icons.favorite,
-                        color: Colors.pink.shade300,
-                        size: 24,
-                      ),
-                      tooltip: '❤️ Liebe',
-                      padding: const EdgeInsets.all(8),
+                  
+                  // Second row: pause buttons (only for active players)
+                  if (!isPaused) ...[
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        // Beer
+                        IconButton(
+                          onPressed: () => onTogglePause('beer'),
+                          icon: Icon(
+                            Icons.sports_bar,
+                            color: Colors.orange.shade600,
+                            size: 24,
+                          ),
+                          tooltip: '🍺 Bier',
+                          padding: const EdgeInsets.all(8),
+                        ),
+                        // Toilet
+                        IconButton(
+                          onPressed: () => onTogglePause('toilet'),
+                          icon: Icon(
+                            Icons.wc,
+                            color: Colors.blue.shade400,
+                            size: 24,
+                          ),
+                          tooltip: '🚽 WC',
+                          padding: const EdgeInsets.all(8),
+                        ),
+                        // Cigarette
+                        IconButton(
+                          onPressed: () => onTogglePause('smoke'),
+                          icon: Icon(
+                            Icons.smoking_rooms,
+                            color: Colors.grey.shade500,
+                            size: 24,
+                          ),
+                          tooltip: '🚬 Rauchen',
+                          padding: const EdgeInsets.all(8),
+                        ),
+                        // Puking/sick
+                        IconButton(
+                          onPressed: () => onTogglePause('sick'),
+                          icon: Icon(
+                            Icons.sick,
+                            color: Colors.green.shade300,
+                            size: 24,
+                          ),
+                          tooltip: '🤮 Kotzen',
+                          padding: const EdgeInsets.all(8),
+                        ),
+                        // Love/sex
+                        IconButton(
+                          onPressed: () => onTogglePause('love'),
+                          icon: Icon(
+                            Icons.favorite,
+                            color: Colors.pink.shade300,
+                            size: 24,
+                          ),
+                          tooltip: '❤️ Liebe',
+                          padding: const EdgeInsets.all(8),
+                        ),
+                      ],
                     ),
                   ],
-                ),
+                ],
               ),
-            ] else ...[
-              // Paused player: show return button centered
-              const SizedBox(height: 8),
-              Center(
-                child: IconButton(
-                  onPressed: () => onTogglePause(''),
-                  icon: Icon(
-                    Icons.near_me,
-                    color: Colors.green.shade400,
-                    size: 32,
-                  ),
-                  tooltip: 'Zurück zum Spiel',
-                ),
+            ),
+            
+            // Right button - delete for active players, return for paused players
+            if (!isPaused)
+              IconButton(
+                onPressed: onRemove,
+                icon: const Icon(Icons.delete),
+                color: Colors.red.shade400,
+                tooltip: 'Entfernen',
+              )
+            else
+              IconButton(
+                onPressed: () => onTogglePause(''),
+                icon: const Icon(Icons.near_me),
+                color: Colors.green.shade400,
+                tooltip: 'Zurück zum Spiel',
               ),
-            ],
           ],
         ),
       ),

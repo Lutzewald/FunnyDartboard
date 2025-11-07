@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../utils/game_provider.dart';
 import '../utils/dartboard_calculator.dart';
 import '../widgets/dartboard_painter.dart';
-import '../widgets/chalk_tick_painter.dart';
 import '../models/player.dart';
 import '../game/shanghai.dart';
 import 'game_over_screen.dart';
@@ -32,7 +31,7 @@ class _GameScreenState extends State<GameScreen>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _zoomAnimation = Tween<double>(begin: 1.0, end: 2.5).animate(
+    _zoomAnimation = Tween<double>(begin: 1.0, end: 3.5).animate(
       CurvedAnimation(parent: _zoomController, curve: Curves.easeInOut),
     );
     _offsetAnimation = Tween<Offset>(begin: Offset.zero, end: Offset.zero)
@@ -51,11 +50,33 @@ class _GameScreenState extends State<GameScreen>
     setState(() {
       _isZoomed = true;
 
+      const zoomFactor = 3.5;
+      final edgeMargin = boardSize.width * 0.15; // 15% of screen width
+
       // Calculate offset to keep tap position centered
       final centerX = boardSize.width / 2;
       final centerY = boardSize.height / 2;
-      final offsetX = (centerX - tapPosition.dx) * 1.5;
-      final offsetY = (centerY - tapPosition.dy) * 1.5;
+      
+      // Desired offset to center the tap position
+      double offsetX = (centerX - tapPosition.dx) * (zoomFactor - 1);
+      double offsetY = (centerY - tapPosition.dy) * (zoomFactor - 1);
+
+      // Add margin shift based on which side was tapped
+      if (tapPosition.dx < centerX) {
+        // Tapped on left half - shift view to the right
+        offsetX += edgeMargin;
+      } else {
+        // Tapped on right half - shift view to the left
+        offsetX -= edgeMargin;
+      }
+      
+      if (tapPosition.dy < centerY) {
+        // Tapped on top half - shift view down
+        offsetY += edgeMargin;
+      } else {
+        // Tapped on bottom half - shift view up
+        offsetY -= edgeMargin;
+      }
 
       _offsetAnimation =
           Tween<Offset>(
@@ -79,14 +100,21 @@ class _GameScreenState extends State<GameScreen>
 
   String _getNextPlayerLabel(GameProvider gameProvider) {
     final game = gameProvider.currentGame;
-    if (game == null) return 'Nächster';
+    if (game == null) return 'Weiter';
 
+    final numPlayers = game.getNumberOfPlayers();
+    
+    // Single player: show "Weiter"
+    if (numPlayers == 1) {
+      return 'Weiter';
+    }
+
+    // Multiple players: show next player's name
     final currentPlayerIndex = game.getCurrentPlayer().playerNumber;
-    final nextPlayerIndex =
-        (currentPlayerIndex + 1) % game.getNumberOfPlayers();
+    final nextPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
     final nextPlayer = game.getPlayer(nextPlayerIndex);
 
-    return 'Nächster: ${nextPlayer.name}';
+    return nextPlayer.name;
   }
 
   @override
@@ -319,7 +347,6 @@ class _GameScreenState extends State<GameScreen>
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             for (int fieldValue = 15; fieldValue <= 20; fieldValue++)
               _buildCricketField(gameProvider, fieldValue),
@@ -338,30 +365,103 @@ class _GameScreenState extends State<GameScreen>
 
     final hits = gameProvider.getHits(fieldValue, currentPlayer);
     final isClosed = game.getField(fieldValue).isClosed();
+    final field = game.getField(fieldValue);
+    final isOpenByPlayer = field.isOpenByPlayer(currentPlayer);
 
-    return Column(
-      children: [
-        Text(
-          fieldValue == 25 ? 'BE' : '$fieldValue',
-          style: TextStyle(
-            color: isClosed ? Colors.red.shade400 : Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            fieldValue == 25 ? 'BE' : '$fieldValue',
+            style: TextStyle(
+              color: isClosed ? Colors.red.shade400 : Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          // Show badge if field is closed or opened, otherwise show ticks
+          SizedBox(
+            height: 26,
+            child: _buildCricketFieldIndicator(hits, isClosed, isOpenByPlayer),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCricketFieldIndicator(int hits, bool isClosed, bool isOpenByPlayer) {
+    // If field is closed, show red badge with lock icon
+    if (isClosed) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.red.shade700,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: const Icon(
+            Icons.lock,
+            color: Colors.white,
+            size: 14,
           ),
         ),
-        const SizedBox(height: 4),
-        // Use chalk ticks instead of dots
-        SizedBox(
-          height: 20,
-          child: hits > 0
-              ? ChalkTicks(
-                  count: hits.clamp(0, 5),
-                  color: isClosed ? Colors.red.shade400 : Colors.white,
-                )
-              : const SizedBox.shrink(),
+      );
+    }
+
+    // If field is opened (3+ hits), show green badge with checkmark
+    if (isOpenByPlayer && hits >= 3) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.green.shade700,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: const Icon(
+            Icons.check,
+            color: Colors.white,
+            size: 14,
+          ),
         ),
-      ],
-    );
+      );
+    }
+
+    // Show orange dots for 1-2 hits
+    if (hits > 0) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.orange.shade700,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.circle,
+                color: Colors.white,
+                size: 8,
+              ),
+              if (hits >= 2) ...[
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.circle,
+                  color: Colors.white,
+                  size: 8,
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildPlayerScores(GameProvider gameProvider) {
@@ -379,38 +479,85 @@ class _GameScreenState extends State<GameScreen>
     final currentPlayer = game.getPlayer(currentPlayerIndex);
     final nextPlayer = game.getPlayer(nextIndex);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Previous player (left)
-        Expanded(
-          child: _buildPlayerScore(
-            player: previousPlayer,
-            fontSize: 14,
-            isCurrent: false,
+    // Handle different player counts
+    if (numPlayers == 1) {
+      // Only 1 player: show current player centered
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: _buildPlayerScore(
+              player: currentPlayer,
+              fontSize: 20,
+              isCurrent: true,
+            ),
           ),
-        ),
+        ],
+      );
+    } else if (numPlayers == 2) {
+      // 2 players: empty left, current center, next right
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Empty space on left
+          const Expanded(child: SizedBox.shrink()),
 
-        // Current player (middle, larger)
-        Expanded(
-          child: _buildPlayerScore(
-            player: currentPlayer,
-            fontSize: 20,
-            isCurrent: true,
+          // Current player (center, larger)
+          Expanded(
+            child: _buildPlayerScore(
+              player: currentPlayer,
+              fontSize: 20,
+              isCurrent: true,
+            ),
           ),
-        ),
 
-        // Next player (right)
-        Expanded(
-          child: _buildPlayerScore(
-            player: nextPlayer,
-            fontSize: 14,
-            isCurrent: false,
+          // Next player (right)
+          Expanded(
+            child: _buildPlayerScore(
+              player: nextPlayer,
+              fontSize: 14,
+              isCurrent: false,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    } else {
+      // 3+ players: previous left, current center, next right
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Previous player (left)
+          Expanded(
+            child: _buildPlayerScore(
+              player: previousPlayer,
+              fontSize: 14,
+              isCurrent: false,
+            ),
+          ),
+
+          // Current player (middle, larger)
+          Expanded(
+            child: _buildPlayerScore(
+              player: currentPlayer,
+              fontSize: 20,
+              isCurrent: true,
+            ),
+          ),
+
+          // Next player (right)
+          Expanded(
+            child: _buildPlayerScore(
+              player: nextPlayer,
+              fontSize: 14,
+              isCurrent: false,
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   Widget _buildPlayerScore({
@@ -451,14 +598,130 @@ class _GameScreenState extends State<GameScreen>
     if (game == null) return const SizedBox.shrink();
 
     final arrows = game.getArrows();
+    final isCricket = gameProvider.selectedGameMode == 2;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (index) {
         final arrow = arrows[index];
 
-        // Show X for invalid throws (score = 0 but arrow exists)
-        if (arrow != null && arrow.getScore() == 0) {
+        // Show dash for unfilled slots
+        if (arrow == null) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: SizedBox(
+              width: 50,
+              height: 24,
+              child: Center(
+                child: Text(
+                  '-',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        final multiplier = arrow.getMultiplier();
+        final number = arrow.getNumber();
+        final score = arrow.getScore();
+
+        // Cricket mode: special handling for valuable fields
+        if (isCricket && multiplier > 0) {
+          final isValuableField = (number >= 15 && number <= 20) || number == 25;
+          
+          if (isValuableField) {
+            if (score > 0) {
+              // Scored points: show the value
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Container(
+                  width: 50,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade700,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$score',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              // Check if this is the arrow that opened the field
+              // Find the last arrow in this turn that hit this field with score=0
+              int lastArrowWithSameField = -1;
+              for (int i = 0; i < arrows.length; i++) {
+                final a = arrows[i];
+                if (a != null && a.getNumber() == number && a.getMultiplier() > 0 && a.getScore() == 0) {
+                  lastArrowWithSameField = i;
+                }
+              }
+              
+              // Check if field is now opened
+              final currentPlayer = gameProvider.currentPlayer;
+              final field = game.getField(number);
+              final isFieldOpened = currentPlayer != null && field.isOpenByPlayer(currentPlayer);
+              
+              // Show checkmark only on the last arrow that opened the field
+              if (isFieldOpened && index == lastArrowWithSameField) {
+                // Field just opened by this arrow: show green checkmark
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Container(
+                    width: 50,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade700,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                // Hit valuable field but not yet opened or earlier hit: show orange dot
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Container(
+                    width: 50,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade700,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.circle,
+                        color: Colors.white,
+                        size: 12,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            }
+          }
+        }
+
+        // Show X for invalid throws (score = 0)
+        if (score == 0) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Container(
@@ -482,30 +745,7 @@ class _GameScreenState extends State<GameScreen>
           );
         }
 
-        // Show dash for unfilled slots
-        if (arrow == null) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: SizedBox(
-              width: 50,
-              height: 24,
-              child: Center(
-                child: Text(
-                  '-',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
-
-        // Show throw value for valid throws (e.g., "3x20", "18", "2x5")
-        final multiplier = arrow.getMultiplier();
-        final number = arrow.getNumber();
+        // Show throw value for valid throws in non-Cricket modes
         final displayText = multiplier == 1
             ? '$number'
             : '${multiplier}x$number';

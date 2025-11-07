@@ -73,7 +73,7 @@ class GameProvider extends ChangeNotifier {
 
   /// Remove a player at index
   void removePlayer(int index) {
-    if (_playerNames.length > 1 && index >= 0 && index < _playerNames.length) {
+    if (index >= 0 && index < _playerNames.length) {
       _playerNames.removeAt(index);
       _playerPaused.removeAt(index);
       _playerPauseReason.removeAt(index);
