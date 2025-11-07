@@ -456,7 +456,8 @@ class _PlayerListItem extends StatelessWidget {
                   if (!isPaused) ...[
                     const SizedBox(height: 8),
                     Wrap(
-                      spacing: 2,
+                      spacing: 0,
+                      runSpacing: 0,
                       children: [
                         // Beer
                         IconButton(
@@ -464,13 +465,13 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.sports_bar,
                             color: Colors.orange.shade600,
-                            size: 20,
+                            size: 18,
                           ),
                           tooltip: '🍺 Bier',
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(2),
                           constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
+                            minWidth: 28,
+                            minHeight: 28,
                           ),
                         ),
                         // Toilet
@@ -479,13 +480,13 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.wc,
                             color: Colors.blue.shade400,
-                            size: 20,
+                            size: 18,
                           ),
                           tooltip: '🚽 WC',
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(2),
                           constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
+                            minWidth: 28,
+                            minHeight: 28,
                           ),
                         ),
                         // Cigarette
@@ -494,13 +495,13 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.smoking_rooms,
                             color: Colors.grey.shade500,
-                            size: 20,
+                            size: 18,
                           ),
                           tooltip: '🚬 Rauchen',
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(2),
                           constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
+                            minWidth: 28,
+                            minHeight: 28,
                           ),
                         ),
                         // Puking/sick
@@ -509,13 +510,13 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.sick,
                             color: Colors.green.shade300,
-                            size: 20,
+                            size: 18,
                           ),
                           tooltip: '🤮 Kotzen',
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(2),
                           constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
+                            minWidth: 28,
+                            minHeight: 28,
                           ),
                         ),
                         // Love/sex
@@ -524,13 +525,13 @@ class _PlayerListItem extends StatelessWidget {
                           icon: Icon(
                             Icons.favorite,
                             color: Colors.pink.shade300,
-                            size: 20,
+                            size: 18,
                           ),
                           tooltip: '❤️ Liebe',
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(2),
                           constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
+                            minWidth: 28,
+                            minHeight: 28,
                           ),
                         ),
                       ],
