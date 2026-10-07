@@ -8,6 +8,26 @@ class Shanghai extends DartGame {
   final Map<int, List<int>> _playerHitMultipliers =
       {}; // Track multipliers hit per player per round
 
+  Set<int> get currentPlayerHitMultipliers =>
+      Set.of(_playerHitMultipliers[currentPlayer.playerNumber] ?? []);
+
+  @override
+  Object captureRuleState() => (
+    currentTargetNumber,
+    _playerHitMultipliers.map(
+      (key, value) => MapEntry(key, List<int>.of(value)),
+    ),
+  );
+
+  @override
+  void restoreRuleState(Object? state) {
+    final saved = state as (int, Map<int, List<int>>);
+    currentTargetNumber = saved.$1;
+    _playerHitMultipliers
+      ..clear()
+      ..addAll(saved.$2);
+  }
+
   Shanghai({required super.numberOfPlayers, super.playerNames}) {
     setPlayerScores(0);
     // Initialize multiplier tracking
@@ -52,7 +72,9 @@ class Shanghai extends DartGame {
   }
 
   @override
-  void nextPlayer() {
+  void nextPlayer({bool saveHistory = true}) {
+    // Save rule state before advancing the round or clearing its hits.
+    if (saveHistory) saveState();
     // Clear multiplier tracking for this player's round
     _playerHitMultipliers[currentPlayer.playerNumber] = [];
 
@@ -72,7 +94,7 @@ class Shanghai extends DartGame {
     }
 
     // Call parent to handle arrows reset and player switching
-    super.nextPlayer();
+    super.nextPlayer(saveHistory: false);
   }
 
   /// Get the current target number
@@ -84,4 +106,3 @@ class Shanghai extends DartGame {
   /// Get total rounds
   int getTotalRounds() => maxRounds;
 }
-

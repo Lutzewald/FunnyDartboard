@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../utils/game_provider.dart';
 import '../utils/dartboard_calculator.dart';
+import '../utils/finishing_paths.dart';
 import '../widgets/dartboard_painter.dart';
 import '../models/player.dart';
 import '../game/shanghai.dart';
@@ -162,8 +163,8 @@ class _GameScreenState extends State<GameScreen>
                     // Main game area
                     Column(
                       children: [
-                        // Spacer for score display
-                        if (_showScore) const SizedBox(height: 200),
+                        if (_showScore) _buildScoreDisplay(gameProvider),
+                        _buildFinishingPaths(gameProvider),
 
                         // Dartboard
                         Expanded(
@@ -223,20 +224,52 @@ class _GameScreenState extends State<GameScreen>
                       ],
                     ),
 
-                    // Score display overlay (tappable to show detailed scores)
-                    if (_showScore)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: _buildScoreDisplay(gameProvider),
-                      ),
                   ],
                 );
               },
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFinishingPaths(GameProvider gameProvider) {
+    final paths = FinishingPaths.forGame(gameProvider.currentGame);
+    if (paths.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.65),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.finishingPaths,
+            style: TextStyle(color: Colors.amber.shade200, fontSize: 12),
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 4,
+            children: [
+              for (final path in paths)
+                Text(
+                  path.map((target) => target.label).join(' → '),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

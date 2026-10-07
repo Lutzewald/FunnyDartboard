@@ -55,7 +55,8 @@ class DartboardPainter extends CustomPainter {
     const sectorAngle = 18.0;
 
     for (int i = 0; i < 20; i++) {
-      final startAngle = (i * sectorAngle - 9) * pi / 180;
+      // Canvas angles start at the right; center sector 20 at the top.
+      final startAngle = (i * sectorAngle - 90 - 9) * pi / 180;
       final sweepAngle = sectorAngle * pi / 180;
 
       // Alternate colors (black and white/cream)

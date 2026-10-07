@@ -75,6 +75,7 @@ class AppLocalizations {
   String get undo => translate('undo');
   String get next => translate('next');
   String get continue_ => translate('continue');
+  String get finishingPaths => translate('finishingPaths');
   
   // Detailed Score
   String get score => translate('score');
@@ -124,6 +125,7 @@ class _AppLocalizationsDelegate
 
 // English (fallback)
 const Map<String, String> _en = {
+  'finishingPaths': 'Finishing paths',
   'start': 'Start',
   'donation': 'Donation',
   'mode301': '301',
@@ -181,6 +183,7 @@ const Map<String, String> _en = {
 
 // German
 const Map<String, String> _de = {
+  'finishingPaths': 'Finish-Wege',
   'start': 'Start',
   'donation': 'Spende',
   'mode301': '301',
@@ -238,6 +241,7 @@ const Map<String, String> _de = {
 
 // Italian
 const Map<String, String> _it = {
+  'finishingPaths': 'Percorsi di chiusura',
   'start': 'Inizia',
   'donation': 'Donazione',
   'mode301': '301',
@@ -295,6 +299,7 @@ const Map<String, String> _it = {
 
 // Spanish
 const Map<String, String> _es = {
+  'finishingPaths': 'Rutas de cierre',
   'start': 'Comenzar',
   'donation': 'Donación',
   'mode301': '301',
@@ -352,6 +357,7 @@ const Map<String, String> _es = {
 
 // French
 const Map<String, String> _fr = {
+  'finishingPaths': 'Possibilités de finition',
   'start': 'Commencer',
   'donation': 'Don',
   'mode301': '301',
@@ -409,6 +415,7 @@ const Map<String, String> _fr = {
 
 // Irish
 const Map<String, String> _ga = {
+  'finishingPaths': 'Bealaí críochnaithe',
   'start': 'Tosaigh',
   'donation': 'Síntiús',
   'mode301': '301',
@@ -463,4 +470,3 @@ const Map<String, String> _ga = {
   'exitDialogMessage': 'Ar mhaith leat dul ar ais go dtí an príomhroghchlár?',
   'linkCouldNotBeOpened': 'Níorbh fhéidir an nasc a oscailt',
 };
-

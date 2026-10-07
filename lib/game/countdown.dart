@@ -8,6 +8,19 @@ class CountDown extends DartGame {
   final String outRule; // straight, double, triple, master
   final Map<int, bool> _playerOpened = {}; // Track which players have "opened"
 
+  bool get currentPlayerOpened =>
+      _playerOpened[currentPlayer.playerNumber] ?? false;
+
+  @override
+  Object captureRuleState() => Map<int, bool>.from(_playerOpened);
+
+  @override
+  void restoreRuleState(Object? state) {
+    _playerOpened
+      ..clear()
+      ..addAll(state as Map<int, bool>);
+  }
+
   CountDown({
     required super.numberOfPlayers,
     required this.startScore,

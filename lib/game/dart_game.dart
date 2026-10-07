@@ -10,6 +10,7 @@ abstract class DartGame extends ScoreBasedGame {
   late List<Arrow?> arrows;
   Player? winner;
   final List<GameState> _history = [];
+  final List<(Object?, bool, Player?)> _ruleHistory = [];
   bool turnBusted = false; // Track if current turn is busted
 
   DartGame({required super.numberOfPlayers, super.playerNames}) {
@@ -64,10 +65,20 @@ abstract class DartGame extends ScoreBasedGame {
     // Restore the last saved state
     final previousState = _history.removeLast();
     _restoreState(previousState);
+    final previousRules = _ruleHistory.removeLast();
+    restoreRuleState(previousRules.$1);
+    gameOver = previousRules.$2;
+    winner = previousRules.$3;
   }
 
   /// Check if undo is available
   bool canUndo() => _history.isNotEmpty;
+
+  Object? captureRuleState() => null;
+
+  void restoreRuleState(Object? state) {}
+
+  void saveState() => _saveState();
 
   /// Save current game state to history
   void _saveState() {
@@ -87,6 +98,7 @@ abstract class DartGame extends ScoreBasedGame {
       turnBusted: turnBusted,
     );
     _history.add(state);
+    _ruleHistory.add((captureRuleState(), gameOver, winner));
   }
 
   /// Restore game state from a snapshot
@@ -127,9 +139,9 @@ abstract class DartGame extends ScoreBasedGame {
   void calculateThrow(Arrow arrow);
 
   @override
-  void nextPlayer() {
+  void nextPlayer({bool saveHistory = true}) {
     // Save current state before switching players
-    _saveState();
+    if (saveHistory) _saveState();
 
     // Clear arrows for the next player
     arrows = List.filled(3, null);
