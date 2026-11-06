@@ -140,7 +140,7 @@ class MainMenuScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         final url = Uri.parse(
-                          'https://www.paypal.me/lutzewald',
+                          'https://81percent.de/de/entwicklungshilfe/',
                         );
                         try {
                           final canLaunch = await canLaunchUrl(url);
